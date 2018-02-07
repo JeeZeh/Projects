@@ -61,7 +61,7 @@ public class VertcoinPrivateKey {
 
         while (num.compareTo(a) >= 0) { // While num >= 58
             int index = num.mod(a).intValue(); // Mod the big int to find the remainder when divided by 58.
-            vertOut = base58[index] + vertOut; // Use that index to add a char from the base58 array to the start of 'out'.
+            vertOut = base58[index] + vertOut; // Use that index to add a char from the base58 array to the start of 'vertOut'.
             num = num.divide(a); // Divide num by 58, discarding the remainder.
         }
 
