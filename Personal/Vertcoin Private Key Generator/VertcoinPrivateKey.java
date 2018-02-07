@@ -22,7 +22,7 @@ public class VertcoinPrivateKey {
         String hex80 = "80" + generateHex();
         
 		try {
-            // Hash hex80 string from above twice
+            // Hash hex80 string from above, twice
             String doubleHash = SHA256.sha256(SHA256.sha256(hex80));
             // Encode hex80 with the first 8 digits of the doubleHash added to the end, in base58
             return encode58(hex80 + doubleHash.substring(0,8));
