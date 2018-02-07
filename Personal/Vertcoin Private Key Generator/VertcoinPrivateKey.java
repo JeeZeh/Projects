@@ -10,10 +10,9 @@ import java.security.NoSuchAlgorithmException;
 
 
 public class VertcoinPrivateKey {
+	
     public static void main(String[] args) {
-		
         System.out.println("\nVertcoin private key: " + generateKey());
-		
     }
 
     // Generates and returns the private key
