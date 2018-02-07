@@ -11,15 +11,18 @@ import java.security.NoSuchAlgorithmException;
 
 public class VertcoinPrivateKey {
     public static void main(String[] args) {
+		
         System.out.println("\nVertcoin private key: " + generateKey());
+		
     }
 
     // Generates and returns the private key
-
     public static String generateKey(){
+		
         // Generate a random 64 digit hex and add "80" to the start
         String hex80 = "80" + generateHex();
-        try {
+        
+		try {
             // Hash hex80 string from above twice
             String doubleHash = SHA256.sha256(SHA256.sha256(hex80));
             // Encode hex80 with the first 8 digits of the doubleHash added to the end, in base58
@@ -28,28 +31,30 @@ public class VertcoinPrivateKey {
             e.printStackTrace();
             return "failed";
         }
-
+		
     }
 
     // Generates the 64 digit hex string
-
     public static String generateHex(){
+		
         char[] hex = "0123456789ABCDEF".toCharArray();
         String hexOut = "";
 
         while(hexOut.length() < 64){
             // Mod a random value between 0 and 100 by 16
-            // Use that as the index to add a random char from the hex array to the string 'out'
+            // Use that as the index to add a random char from the hex array to the string 'hexOut'
             hexOut += hex[(int)(Math.random()*100) % 16];
         }
 
         return hexOut;
+		
     }
 
     // Encodes the incoming hex string as a base58 string.
     public static String encode58(String in){
+		
         char[] base58 = "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz".toCharArray();
-        // Uses BigInteger to store the very large integer, when the string is converted from hex to decimal.
+        // Uses BigInteger to store the very large number, when the string is converted from hex to decimal.
         BigInteger input = new BigInteger(in, 16);
         String vertOut = "";
         BigInteger num = input;
@@ -67,5 +72,6 @@ public class VertcoinPrivateKey {
         }
 
         return vertOut; // Return the string, which is now a valid Vertcoin private key.
+		
     }
 }
