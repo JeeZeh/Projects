@@ -9,7 +9,6 @@ import java.security.NoSuchAlgorithmException;
  * @since 07/02/2018
  */
 
-
 public class VertcoinPrivateKey {
 
     public static void main(String[] args) {
