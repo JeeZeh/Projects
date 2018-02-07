@@ -49,7 +49,7 @@ public class VertcoinPrivateKey {
     // Encodes the incoming hex string as a base58 string.
     public static String encode58(String in){
         char[] base58 = "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz".toCharArray();
-        // Uses BigInteger to store the very large string, when converted from hex to decimal.
+        // Uses BigInteger to store the very large integer, when the string is converted from hex to decimal.
         BigInteger input = new BigInteger(in, 16);
         String vertOut = "";
         BigInteger num = input;
