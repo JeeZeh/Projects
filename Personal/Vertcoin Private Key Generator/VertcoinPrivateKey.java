@@ -63,8 +63,7 @@ public class VertcoinPrivateKey {
 
         if(num.compareTo(BigInteger.valueOf(0)) > 0 ){ // If the number is greater than 0
             int index = num.mod(a).intValue(); // Mod again
-            // Add that char to the final 'out' string.
-            return base58[index] + vertOut; // Return the string, which is now a valid Vertcoin private key.
+            vertOut = base58[index] + vertOut; // Add that char to the final 'vertOut' string.
         }
 
         return vertOut; // Return the string, which is now a valid Vertcoin private key.
