@@ -32,16 +32,16 @@ public class Boggle {
         System.out.println("The following words were found:");
         for (String word : found) {
             int len = word.length();
-            if(len <= 4)
+            if (len <= 4)
                 sum++;
-            else if(len == 5)
-                sum+=2;
-            else if(len == 6)
-                sum+=3;
-            else if(len == 7)
-                sum+=5;
+            else if (len == 5)
+                sum += 2;
+            else if (len == 6)
+                sum += 3;
+            else if (len == 7)
+                sum += 5;
             else
-                sum+=11;
+                sum += 11;
             System.out.println(word);
         }
         System.out.println("Total: " + sum);
@@ -83,7 +83,7 @@ public class Boggle {
         return search != null && !search.children.isEmpty();
     }
 
-    private static void printBoard(){
+    private static void printBoard() {
         for (int i = 0; i < 4; i++) {
             for (int j = 0; j < 4; j++) {
                 System.out.print(grid[i][j].data + " ");
@@ -108,7 +108,7 @@ public class Boggle {
         gridCopy[i][j].setVisited();
         if (path.length() > 2) {
             if (checkWord(path))
-                if(!found.contains(path))
+                if (!found.contains(path))
                     found.add(path);
         }
         if (hasPotential(path)) {
