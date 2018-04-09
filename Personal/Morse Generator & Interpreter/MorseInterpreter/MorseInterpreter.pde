@@ -8,11 +8,12 @@ AudioInput in;
 FFT fft;
 
 String text = "";
-String binary = "";
 String output = "";
 float currentVol;
+int msLen = 55;
+int freq = 1300;
+int level = 5;
 int last = -1;
-int loud = 220;
 String currentCode = "";
 float lenGap;
 long startBeep;
@@ -38,8 +39,8 @@ void draw(){
   fft.forward( in.mix );
   background(0);
   textSize(14);
-  text(fft.getFreq(1300), 20, 20);
-  if(fft.getFreq(1300) > 25.0){
+  text(fft.getFreq(freq), 20, 20);
+  if(fft.getFreq(freq) > level){
     if(!beeped){
       if(timeout){
         output="";
@@ -47,12 +48,12 @@ void draw(){
       }
       startBeep = System.currentTimeMillis();
       lenGap = (float)(startBeep - lastBeepTime)*0.85;
-      if(lenGap > 160 && lenGap < 360){
+      if(lenGap > msLen*2 && lenGap < msLen*4.5){
         output+= " ";
         text += morseMap.get(currentCode);
         currentCode = "";
       }
-      else if(lenGap > 430 && lenGap < 700){
+      else if(lenGap > msLen*4.5 && lenGap < msLen*8.5){
         output+= " | ";
         text += morseMap.get(currentCode) + " ";
         currentCode = "";
@@ -67,17 +68,17 @@ void draw(){
       lastBeepTime = System.currentTimeMillis();
       lenBeep = (float)(System.currentTimeMillis() - startBeep)*0.85;
       beeped = false;
-      if(lenBeep > 25 && lenBeep < 180){
+      if(lenBeep > msLen*.3 && lenBeep < msLen*2.25){
         currentCode+= ".";
         output+= ".";
       }
-      else if(lenBeep > 180 && lenBeep < 310){
+      else if(lenBeep > msLen*2.25 && lenBeep < msLen*3.75){
         currentCode+= "-";
         output+= "-";  
       }
       timeout = false;
     }
-    if((System.currentTimeMillis() - lastBeepTime) > 800 && !timeout && lastBeepTime > 1){
+    if((System.currentTimeMillis() - lastBeepTime) > msLen*10 && !timeout && lastBeepTime > 1){
       timeout = true;
       text += morseMap.get(currentCode);
       currentCode = "";
@@ -88,4 +89,5 @@ void draw(){
     text("Morse: " + output, 20, 180);
     text("Text: " + text, 20, 210);
     text("Current: " + currentCode, 20, 240);
+    println(text);
 }

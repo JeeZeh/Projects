@@ -4,7 +4,7 @@ import javax.sound.sampled.*;
 import static java.lang.Thread.sleep;
 
 public class TextToMorse {
-    private static int msLen = 80; // Unit of time in ms
+    private static int msLen = 55; // Unit of time in ms
     private static int freq = 1300; // Frequency in Hz
     private static double vol = 1; // Volume from 0 - 1.00
     private static HashMap<Character, String> morseMap = new HashMap<>(); // Holds the {letter : morse} pairs
