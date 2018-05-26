@@ -2,7 +2,7 @@ from __future__ import print_function
 from PIL import Image,ImageDraw
 import os
 
-filelist = os.listdir("D:\Documents\GitHub\Projects\Personal\ASCII Generator\in\\")
+filelist = os.listdir("D:/Documents/GitHub/Projects/Personal/ASCII Generator/in/")
 
 def ascii(fname, colour, resolution):
     lum = True
