@@ -9,11 +9,14 @@ Requires Pillow as a dependency
 `pip install pillow`
 
 I haven't implemented folder creation, so make sure you have the following structure.
-> /in/
-> /out
->   /lum/
->   /rgb/
-> ascii.py 
+
+```
+/in/
+/out
+   /lum/
+   /rgb/
+ascii.py
+```
 
 ## Usage
 
@@ -32,4 +35,3 @@ Choose options with user input.
 ## Output
 
 Image files encoded in ascii chars to `./out/` and the relevant subfolders `lum` or `rgb`.
-
