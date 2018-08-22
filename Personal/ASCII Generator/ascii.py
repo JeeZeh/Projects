@@ -2,7 +2,7 @@ from __future__ import print_function
 from PIL import Image,ImageDraw
 import os
 
-filelist = os.listdir("D:/Documents/GitHub/Projects/Personal/ASCII Generator/in/")
+filelist = os.listdir(os.path.dirname(__file__) + "in/")
 
 def ascii(fname, colour, resolution, background):
     lum = True
@@ -33,7 +33,7 @@ def ascii(fname, colour, resolution, background):
 
     ascii_12 = ['.', '-', ';', '=', '*', 'I', 'V', 'F', 'X', 'N', '%', '@']
 
-    img_rgb = Image.open("D:/Documents/GitHub/Projects/Personal/ASCII Generator/in/" + fname)
+    img_rgb = Image.open("./in/" + fname)
 
     spacing = 10
 
@@ -62,20 +62,20 @@ def ascii(fname, colour, resolution, background):
         for y in range(0, h):
             lum_row = []
             for x in range(0, w):
-                lum_row.append(11-round(img_lum.getpixel((x,y))/23.2))     
+                lum_row.append(11-int(img_lum.getpixel((x,y))/23.2))     
             lum_map.append(lum_row)
     else:
         for y in range(0, h):
             lum_row = []
             for x in range(0, w):
-                lum_row.append(round(img_lum.getpixel((x,y))/23.2))     
+                lum_row.append(int(img_lum.getpixel((x,y))/23.2))     
             lum_map.append(lum_row)
     
     if(rgb):
         for y in range(0, h):
             rgb_row = []
             for x in range(0, w): 
-                rgb_row.append(img_rgb.getpixel((x,y)))    
+                rgb_row.append(img_rgb.getpixel((x,y)))  
             rgb_map.append(rgb_row)
 
     for y in range(0, h):
@@ -92,8 +92,8 @@ def ascii(fname, colour, resolution, background):
         rgb_out.save(rgb_dir + fname)
         print("Saved: " + file + " (RGB)")
 
-colour = input("Colour Mode? '1' - RGB, '2' - BW or '3' - both\n").lower()
-resolution = input("Resolution? '1' - low, '2' - medium, '3' - high\n").lower()
+colour = input("Colour Mode? '1' - RGB, '2' - BW or '3' - both\n")
+resolution = input("Resolution? '1' - low, '2' - medium, '3' - high\n")
 background = input("Background? '1' - black on white, '2' - white on black\n")
 
 
