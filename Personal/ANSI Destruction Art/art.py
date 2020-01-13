@@ -41,13 +41,14 @@ def demo():
             sleep(1 / FRAMERATE)
 
 
-def generate_column(template=None, random=True, width=8, height=20, theme=THEME_STD):
+def generate_column(template=None, random=True, width=None, height=20, theme=THEME_STD):
     if template and random:
         template = list(map(str, template))
         column = []
         for _ in range(height):
             r.shuffle(template)
-            column.append(Node("".join(template), theme=theme))
+            length = min(width, len(template)) if width else len(template)
+            column.append(Node("".join(template[:length]), theme=theme))
     elif template and not random:
         template = list(map(str, template))
         column = [Node(template, theme=theme) for _ in range(height)]
@@ -110,11 +111,21 @@ def dissolveV2(collection, allow_linger=False, wipe=True):
     """
 
     dead = 0
+    dissolve_rate = 3
+    animation_rate = 3
+    frame = 0
     while dead < len(collection):
         for node in collection:
             if not node.dead:
+                if dissolve_rate > 1 and frame % dissolve_rate != 0:
+                    if animation_rate > 1 and frame % animation_rate != 0:
+                        continue
+                    node.update_state()
+                    continue
                 if not node.healthy:
                     if allow_linger and node.health == 1 and r.random() > 0.25:
+                        if r.random() > 0.5:
+                            node.update_state()
                         pass
                     # elif allow_linger and 2 < node.health < 15 and r.random() > 0.6:
                     #     pass
@@ -128,6 +139,7 @@ def dissolveV2(collection, allow_linger=False, wipe=True):
                         break
                 if node.dead:
                     dead += 1
+        frame += 1
         yield
 
 
@@ -139,7 +151,7 @@ def print_column(column):
 
 
 def vertical_destruct(
-    template, random=False, width=8, height=30, blocks=False, theme=THEME_STD
+    template, random=False, width=None, height=40, blocks=False, theme=THEME_STD, wipe=True
 ):
     """
     Drives the vertical destruct methods
@@ -149,10 +161,10 @@ def vertical_destruct(
         column = generate_column(width=width, height=height, theme=theme)
     else:
         column = generate_column(
-            template=template, random=random, height=height, theme=theme
+            template=template, random=random, width=width, height=height, theme=theme
         )
 
-    d = dissolveV2(column, allow_linger=True)
+    d = dissolveV2(column, allow_linger=True, wipe=wipe)
 
     d.send(None)
     frame = 1
@@ -164,15 +176,16 @@ def vertical_destruct(
         sleep(1 / (FRAMERATE * 1.5))
         frame += 1
 
-FRAMERATE = 20
+FRAMERATE = 30
 def main():
     # demo()
     vertical_destruct(
-        template=[0,0,0,0,0,0,0,0],
-        random=False,
-        width=12,
-        height=25,
+        template="0123456789",
+        random=True,
+        width=30,
+        height=40,
         blocks=False,
+        wipe=True,
         theme=THEME_LOW_HEALTH,
     )
 
