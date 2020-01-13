@@ -1,15 +1,14 @@
 import colours as c
-from random import randint
+import random
 
-health_map = {
-    3: ["∄", "∉", "∎", "Д", "⍬", "≨", "#"],
-    2: ["∺", "∾", ";", "∢", "⊹", "≄", "π"],
-    1: ["`", "¬", "∵", "᛫", "⋅", "⋄", "^"],
+dissolve_chars = {
+    "text": {
+        3: ["∄", "∉", "∎", "Д", "⍬", "≨", "#"],
+        2: ["∺", "∾", ";", "∢", "⊹", "≄", "π"],
+        1: ["`", "¬", "∵", "᛫", "⋅", "⋄", "^"],
+    },
+    "block": {3: ["▓"], 2: ["▒"], 1: ["░"]},
 }
-
-colours = [c.ENDC, c.OKBLUE, c.WARNING, c.FAIL]
-colours.reverse()
-
 
 class Node:
     """
@@ -17,18 +16,24 @@ class Node:
     """
 
     MAX_HEALTH = 4
+    version = "text"
     source = ""
-    health = MAX_HEALTH
-    state = ""
+    health = 0
+    state = []
     healthy = True
     colour = c.ENDC
+    theme = [c.ENDC, c.OKBLUE, c.WARNING, c.FAIL]
     dead = False
 
-    def __init__(self, source, colour=c.ENDC, health=MAX_HEALTH):
+    def __init__(self, source, colour=c.ENDC, health=MAX_HEALTH, version="text", theme=theme):
         self.source = source
         self.colour = colour
-        self.health = health
+        if len(theme) != self.MAX_HEALTH:
+            raise ValueError(f"Colour list {theme} does not match MAX_HEALTH ({self.MAX_HEALTH})")
+        self.theme = theme
+        self.health = len(source) * self.MAX_HEALTH
         self.state = [(s, self.MAX_HEALTH) for s in source]
+        self.version = version
         if health != self.MAX_HEALTH:
             self.update_state()
 
@@ -40,7 +45,7 @@ class Node:
 
     def set_health(self, health):
         self.state = [(c[0], health) for c in self.state]
-        self.update_stateV2()
+        self.update_state()
 
     def reset(self):
         self.health = self.MAX_HEALTH
@@ -49,24 +54,9 @@ class Node:
 
     def update_state(self):
         """
-        Generates a new state of the node based on health
+        Updates the node characters based on health.
         """
 
-        if 0 < self.health < 4:
-            self.healthy = False
-            self.state = "".join(
-                [
-                    health_map[self.health][randint(0, 6)]
-                    if randint(0, 3) > self.health - 1
-                    else char
-                    for char in self.source
-                ]
-            )
-        elif self.health <= 0:
-            self.dead = True
-            self.state = " " * len(self.source)
-
-    def update_stateV2(self):
         dead = True
         remaining = [x for x, char in enumerate(self.state) if char[1] >= 0]
         for i in remaining:
@@ -77,27 +67,29 @@ class Node:
                 else:
                     dead = False
                     self.healthy = False
-                    self.state[i] = (health_map[h][randint(0, 5)], h)
+                    self.state[i] = (random.choice(dissolve_chars[self.version][h]), h)
             else:
                 dead = False
         self.dead = dead
 
-    def hurt(self):
+    def attack(self, times=1):
         """
         Decrement the health
         """
         if not self.dead:
-            remaining = [x for x, char in enumerate(self.state) if char[1] > 0]
-            attack = remaining[randint(0, len(remaining) - 1)]
-            self.state[attack] = (self.state[attack][0], self.state[attack][1] - 1)
-            self.update_stateV2()
+            for _ in range(times):
+                self.health -= 1
+                remaining = [x for x, char in enumerate(self.state) if char[1] > 0]
+                attack = remaining[random.randint(0, len(remaining) - 1)]
+                self.state[attack] = (self.state[attack][0], self.state[attack][1] - 1)
+            self.update_state()
 
     def __repr__(self):
         return "".join(
-            map(lambda x: f"{colours[max(0, x[1]-1)]}{x[0]}{c.ENDC}", self.state)
+            map(lambda x: f"{self.theme[max(0, x[1]-1)]}{x[0]}{c.ENDC}", self.state)
         )
 
     def __str__(self):
         return "".join(
-            map(lambda x: f"{colours[max(0, x[1]-1)]}{x[0]}{c.ENDC}", self.state)
+            map(lambda x: f"{self.theme[max(0, x[1]-1)]}{x[0]}{c.ENDC}", self.state)
         )

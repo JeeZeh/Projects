@@ -3,10 +3,14 @@ import colours as c
 from time import sleep
 from itertools import permutations
 import os
-import random
+import random as r
 
 SEP = f"{c.ENDC} "
-FRAMERATE = 30
+
+THEME_STD = [c.FAIL, c.WARNING, c.OKBLUE, c.ENDC]
+THEME_MONO = [c.ENDC] * 4
+THEME_LOW_HEALTH = [c.FAIL, c.ENDC, c.ENDC, c.ENDC]
+
 
 def cls():
     os.system("cls" if os.name == "nt" else "clear")
@@ -37,21 +41,27 @@ def demo():
             sleep(1 / FRAMERATE)
 
 
-def main():
-    # demo()
-    vertical_destruct(40)
-
-def generate_column(set, size):
-    perms = permutations(map(str, set))
-    column = []
-    for p in perms:
-        column.append(Node("".join(p)))
-        if len(column) == size:
-            break
+def generate_column(template=None, random=True, width=8, height=20, theme=THEME_STD):
+    if template and random:
+        template = list(map(str, template))
+        column = []
+        for _ in range(height):
+            r.shuffle(template)
+            column.append(Node("".join(template), theme=theme))
+    elif template and not random:
+        template = list(map(str, template))
+        column = [Node(template, theme=theme) for _ in range(height)]
+    else:
+        column = [
+            Node("█" * width, version="block", theme=theme) for _ in range(height)
+        ]
 
     return column
 
-class BreakIt(Exception): pass
+
+class BreakIt(Exception):
+    pass
+
 
 def dissolve(collection, length, trail=10):
     """
@@ -65,21 +75,21 @@ def dissolve(collection, length, trail=10):
     """
 
     total_health = len(collection[0].state) * Node.MAX_HEALTH * len(collection)
-    hits_per_cycle = int((total_health / (length * FRAMERATE))+1)
+    hits_per_cycle = int((total_health / (length * FRAMERATE)) + 1)
 
     start = 0
     while start < len(collection):
         try:
             hits = 0
             for i in range(start, len(collection)):
-                for j in range(start, min(i+trail, len(collection))):
+                for j in range(start, min(i + trail, len(collection))):
                     if hits == hits_per_cycle:
                         raise BreakIt
                     else:
-                        if random.randint(0, 1) == 0:
+                        if r.randint(0, 1) == 0:
                             node = collection[j]
                             if not node.dead:
-                                node.hurt()
+                                node.attack()
                                 hits += 1
                             if node.dead:
                                 if j == start:
@@ -89,28 +99,83 @@ def dissolve(collection, length, trail=10):
         except BreakIt:
             for node in collection:
                 if not node.healthy:
-                    node.update_stateV2()
+                    node.update_state()
             hits = 0
-            yield 
+            yield
 
-def vertical_destruct(size):
+
+def dissolveV2(collection, allow_linger=False, wipe=True):
+    """
+    A more emergent method of dissolving the collection.
+    """
+
+    dead = 0
+    while dead < len(collection):
+        for node in collection:
+            if not node.dead:
+                if not node.healthy:
+                    if allow_linger and node.health == 1 and r.random() > 0.25:
+                        pass
+                    # elif allow_linger and 2 < node.health < 15 and r.random() > 0.6:
+                    #     pass
+                    # elif allow_linger and 16 < node.health < 35 and r.random() > 0.8:
+                    #     pass
+                    else:
+                        node.attack()
+                if node.healthy:
+                    node.attack(max(1, int(len(node.source) / 8)))
+                    if wipe:
+                        break
+                if node.dead:
+                    dead += 1
+        yield
+
+
+def print_column(column):
+    cls()
+    print("\n".join(map(repr, column)))
+    # print(f"Frame {frame}")
+    sleep(1 / (FRAMERATE * 1.5))
+
+
+def vertical_destruct(
+    template, random=False, width=8, height=30, blocks=False, theme=THEME_STD
+):
     """
     Drives the vertical destruct methods
     """
 
-    column = generate_column([1,2,3,4,5], size)
+    if blocks:
+        column = generate_column(width=width, height=height, theme=theme)
+    else:
+        column = generate_column(
+            template=template, random=random, height=height, theme=theme
+        )
 
-    d = dissolve(column, 2)
+    d = dissolveV2(column, allow_linger=True)
 
     d.send(None)
     frame = 1
     for _ in d:
+        # print_column(column)
         cls()
         print("\n".join(map(repr, column)))
         print(f"Frame {frame}")
-        sleep(1/(FRAMERATE*1.5))
+        sleep(1 / (FRAMERATE * 1.5))
         frame += 1
-    
+
+FRAMERATE = 20
+def main():
+    # demo()
+    vertical_destruct(
+        template=[0,0,0,0,0,0,0,0],
+        random=False,
+        width=12,
+        height=25,
+        blocks=False,
+        theme=THEME_LOW_HEALTH,
+    )
+
 
 if __name__ == "__main__":
     main()
